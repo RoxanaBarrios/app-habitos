@@ -1,20 +1,53 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
+import { Session } from "@supabase/supabase-js";
+import Home from "./src/screens/Home";
+import Auth from "./src/screens/Auth";
+import { supabase } from "./src/lib/supabase";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setIsLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      setSession(currentSession);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!session) {
+    return <Auth />;
+  }
+
+  return <Home userId={session.user.id} onLogout={handleLogout} />;
+}
