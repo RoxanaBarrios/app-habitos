@@ -1,6 +1,8 @@
 # app-habitos
 
-Aplicación para crear y mantener hábitos durante 21 días consecutivos. Cuando completes un hábito durante 21 días seguidos, se marca como adquirido y se agrega a tu historial.
+Aplicación móvil para crear y mantener hábitos durante 21 días consecutivos con interfaz minimalista tipo iOS. Cuando completes un hábito durante 21 días seguidos, se marca como adquirido y se agrega a tu historial personal.
+
+**Stack:** React Native + Expo + TypeScript + Supabase + Vitest
 
 ## 🚀 Configuración inicial
 
@@ -41,42 +43,103 @@ Luego presiona:
 - `a` para Android (requiere emulador)
 - `i` para iOS (requiere Mac)
 
-## 📋 Características
+## 📋 Características principales
 
-✅ **Crear hábitos** con nombre, descripción, categoría y color
-✅ **Racha individual** - Cuenta días consecutivos por hábito
-✅ **Racha general** - Cuenta días seguidos con al menos 1 hábito completado
-✅ **21 días** - Automáticamente se marca como adquirido al completar 21 días
-✅ **Métricas** - Progreso del día, racha general, hábitos adquiridos
-✅ **Autenticación** - Login/Registro seguro con Supabase
-✅ **Persistencia** - Todo guardado en base de datos
+✅ **Crear hábitos** con nombre, descripción, categoría y color personalizable
+✅ **Racha individual** - Contador de días consecutivos completados por hábito
+✅ **Racha general** - Contador de días con al menos 1 hábito completado
+✅ **Ciclo de 21 días** - Automáticamente se marca como adquirido tras 21 días consecutivos
+✅ **Confirmación de completado** - Diálogo para evitar completar hábitos accidentalmente
+✅ **Calendario visual** - Visualiza el progreso de 21 días de cada hábito
+✅ **Métricas** - Dashboard con racha general, hábitos adquiridos y activos
+✅ **Perfil** - Gestión de username y datos de usuario
+✅ **Autenticación** - Login/Registro seguro con Supabase Auth
+✅ **Persistencia completa** - Todo guardado en base de datos Supabase
+
+## 🎨 Pantallas
+
+| Pantalla | Función |
+|----------|---------|
+| **Auth** | Login y registro de usuarios |
+| **Home** | Lista de hábitos activos, racha general y botón para crear |
+| **Calendario** | Visualización de 21 días con hábitos activos marcados |
+| **Estadísticas** | Dashboard con métricas y hábitos adquiridos |
+| **Perfil** | Gestión de usuario y opciones de testing |
 
 ## 📁 Estructura del proyecto
 
 ```
 src/
-├── components/       # Componentes UI
-├── controllers/      # Lógica de negocio
-├── lib/             # Configuración Supabase
-├── models/          # Interfaces de datos
-├── screens/         # Pantallas principales
-└── storage/         # Servicios de almacenamiento
+├── components/          # Componentes UI reutilizables
+│   ├── HabitCard.tsx    # Tarjeta individual de hábito
+│   └── TabBar.tsx       # Navegación inferior
+├── lib/
+│   └── supabase.ts      # Configuración de Supabase
+├── models/
+│   └── Habit.ts         # Interfaces TypeScript
+├── screens/             # Pantallas principales
+│   ├── Auth.tsx
+│   ├── Home.tsx
+│   ├── Calendar.tsx
+│   ├── Metrics.tsx
+│   └── Profile.tsx
+├── storage/             # Servicios de datos
+│   ├── habitService.ts   # Lógica de hábitos
+│   ├── userService.ts    # Gestión de usuarios
+│   └── seedData.ts       # Datos de testing
+├── theme/
+│   └── colors.ts        # Diseño y colores
+└── __tests__/           # Tests unitarios
+    ├── habitService.test.ts
+    └── calendar.test.ts
 ```
+
+## 🧪 Testing
+
+Ejecutar tests unitarios:
+```bash
+npm test              # Modo watch
+npm test -- --run     # Una sola pasada
+npm test -- --coverage  # Con reporte de cobertura
+```
+
+**Estado actual:** ✅ 13 tests pasando (7 utilidades + 6 lógica de calendario)
+
+## 🎨 Diseño y UX
+
+- **Estética iOS minimalista** con colores neutros
+- **Tarjetas sin bordes** para diseño limpio (excepto racha general)
+- **TabBar transparente** (opacity 0.7) con navegación fluida
+- **Títulos grandes** (Typography.title1) con espaciado superior generoso
+- **StatusBar blanco** (light-content) en todas las pantallas
+- **Confirmación de acciones** antes de completar o eliminar hábitos
 
 ## 🔐 Seguridad
 
-- RLS (Row Level Security) activado en todas las tablas
+- **RLS (Row Level Security)** activado en todas las tablas
 - Cada usuario solo puede ver/editar sus propios datos
-- Autenticación con Supabase Auth
+- **Autenticación con Supabase Auth** (JWT tokens)
+- Variables de entorno protegidas
 
 ## 🐛 Troubleshooting
 
-**Error: "Cannot find EXPO_PUBLIC_SUPABASE_URL"**
-- Verifica que el archivo `.env` existe en la raíz
-- Reinicia Expo: `npx expo start -c`
+| Error | Solución |
+|-------|----------|
+| "Cannot find EXPO_PUBLIC_SUPABASE_URL" | Verifica que `.env` existe en raíz y reinicia con `npx expo start -c` |
+| "Tables don't exist" | Ejecuta el SQL de `SUPABASE_SETUP.md` en Supabase SQL Editor |
+| "Cannot use JSX" | Asegúrate que archivos son `.tsx` no `.ts` |
+| "Permission denied" | Verifica RLS policies en Supabase (ver `SUPABASE_SETUP.md`) |
 
-**Error: "Tables don't exist"**
-- Ejecuta el SQL de `SUPABASE_SETUP.md` en el SQL Editor de Supabase
+## 📚 Documentación adicional
 
-**Error: "Cannot use JSX"**
-- Asegúrate que los archivos `.tsx` tienen la extensión correcta (no `.ts`)
+- [SETUP_INSTRUCTIONS.md](./SETUP_INSTRUCTIONS.md) - Guía detallada de configuración
+- [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) - SQL y configuración de base de datos
+- [FIX_RLS_USERS.md](./FIX_RLS_USERS.md) - Notas sobre Row Level Security
+
+## 📦 Dependencias principales
+
+- `expo` - Framework React Native
+- `@supabase/supabase-js` - Cliente de base de datos
+- `react-native` - Framework móvil
+- `typescript` - Tipado estático
+- `vitest` - Testing framework
